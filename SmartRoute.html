@@ -1,66 +1,54 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SmartRoute — Student Pickup Optimizer</title>
-
-  <!-- main stylesheet -->
-  <link rel="stylesheet" href="SmartRoute.css">
-
-  <!-- Leaflet CSS (map) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-sA+e2b9u3w2gkXo3qk0h1QvQ8Kq1QvJb2Z+3x0xP4wE="
-        crossorigin=""/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartRoute — Student Pickup Optimizer</title>
+<link rel="stylesheet" href="SmartRoute.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="title">
-      <h1>SmartRoute</h1>
-      <div class="tag">Fast pickup & drop-off planning for students</div>
+
+<header class="topbar">
+  <div class="title">
+    <h1>SmartRoute</h1>
+    <div class="tag">Fast pickup & drop-off planning for students</div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="panel inputs">
+    <h2>Route Inputs</h2>
+
+    <label for="start">Start location (leave blank to use GPS)</label>
+    <input id="start" type="text" placeholder="e.g. Lakeshore, Burlington or lat,lon">
+
+    <div class="row">
+      <button id="useLocation">Use my location</button>
+      <button id="addPickup">+ Add pickup</button>
+      <button id="clearAll" class="danger">Clear</button>
     </div>
-  </header>
 
-  <main class="container">
-    <section class="panel inputs">
-      <h2>Route Inputs</h2>
+    <div id="pickupsContainer" class="pickups"></div>
 
-      <label for="start">Start location (leave blank to use GPS)</label>
-      <input id="start" type="text" placeholder="e.g. Lakeshore, Burlington or lat,lon" />
+    <label for="end">Final drop-off (school)</label>
+    <input id="end" type="text" placeholder="School address or lat,lon">
 
-      <div class="row">
-        <button id="useLocation">Use my location</button>
-        <button id="addPickup">+ Add pickup</button>
-        <button id="clearAll" class="danger">Clear</button>
-      </div>
+    <div class="row">
+      <button id="optimize" class="primary">Get best route</button>
+    </div>
 
-      <div id="pickupsContainer" class="pickups"></div>
+    <div id="results" class="results"></div>
+    <div id="links" class="links"></div>
+  </section>
 
-      <label for="end">Final drop-off (school)</label>
-      <input id="end" type="text" placeholder="School address or lat,lon" />
+  <section class="panel mapPanel">
+    <div id="map"></div>
+  </section>
+</main>
 
-      <div class="row">
-        <button id="optimize" class="primary">Get best route</button>
-      </div>
-
-      <div id="results" class="results" aria-live="polite"></div>
-      <div id="links" class="links"></div>
-
-      <p class="notes">Uses OpenStreetMap Nominatim for geocoding. Optimization uses straight-line (Haversine) distances — ideal for a few stops. For driving-time accuracy replace scoring with a Distance Matrix API.</p>
-    </section>
-
-    <section class="panel mapPanel">
-      <div id="map"></div>
-      <footer>Tip: To improve real driving order, plug in Google/Mapbox/OpenRouteService Distance Matrix.</footer>
-    </section>
-  </main>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-          integrity="sha256-o9N1j7kG8f2g46wY6bfxmQbXQfY5x7v1y0Z1b2w5q2U="
-          crossorigin=""></script>
-
-  <!-- app script -->
-  <script src="SmartRoute.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="SmartRoute.js"></script>
 </body>
 </html>
