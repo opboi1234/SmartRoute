@@ -19,34 +19,42 @@
 
 <main class="container">
   <section class="panel inputs">
+    <div class="instructions" aria-live="polite">
+      Enter your start, pickups, and school. Click "Get best route" for the optimal order and map. <br>
+      <b>Tip:</b> You can enter addresses or "lat,lon". Max 6 pickups.
+    </div>
     <h2>Route Inputs</h2>
 
-    <label for="start">Start location (leave blank to use GPS)</label>
-    <input id="start" type="text" placeholder="e.g. Lakeshore, Burlington or lat,lon">
+    <label for="start">Start location <span class="small">(leave blank to use GPS)</span></label>
+    <input id="start" type="text" placeholder="e.g. Lakeshore, Burlington or lat,lon" aria-label="Start location">
 
     <div class="row">
-      <button id="useLocation">Use my location</button>
-      <button id="addPickup">+ Add pickup</button>
-      <button id="clearAll" class="danger">Clear</button>
+      <button id="useLocation" aria-label="Use my location">Use my location</button>
+      <button id="addPickup" aria-label="Add pickup">+ Add pickup</button>
+      <button id="clearAll" class="danger" aria-label="Clear all">Clear</button>
     </div>
 
     <div id="pickupsContainer" class="pickups"></div>
 
     <label for="end">Final drop-off (school)</label>
-    <input id="end" type="text" placeholder="School address or lat,lon">
+    <input id="end" type="text" placeholder="School address or lat,lon" aria-label="Final drop-off">
 
     <div class="row">
-      <button id="optimize" class="primary">Get best route</button>
+      <button id="optimize" class="primary" aria-label="Get best route">Get best route</button>
     </div>
 
-    <div id="results" class="results"></div>
+    <div id="results" class="results" aria-live="polite"></div>
     <div id="links" class="links"></div>
   </section>
 
   <section class="panel mapPanel">
-    <div id="map"></div>
+    <div id="map" aria-label="Route map"></div>
   </section>
 </main>
+
+<footer>
+  <div>Made with 💡 SmartRoute &mdash; For help, see instructions above or <a href="https://github.com/opboi1234/SmartRoute" style="color:var(--accent)">GitHub</a></div>
+</footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="SmartRoute.js"></script>
