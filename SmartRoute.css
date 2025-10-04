@@ -1,0 +1,45 @@
+:root{
+  --bg:#071024;
+  --card:#0b1220;
+  --accent:#4f46e5;
+  --accent2:#06b6d4;
+  --muted:#94a3b8;
+  --glass: rgba(255,255,255,0.03);
+  --radius:12px;
+}
+
+*{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,#071024 0%, #07182b 100%);color:#e6eef8}
+.topbar{padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:12px}
+.title h1{margin:0;font-size:20px}
+.tag{font-size:13px;color:var(--muted)}
+
+.container{display:grid;grid-template-columns:420px 1fr;gap:20px;padding:22px;align-items:start;max-width:1200px;margin:0 auto}
+.panel{background:var(--card);padding:16px;border-radius:var(--radius);box-shadow:0 8px 20px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+.inputs h2{margin:0 0 8px}
+label{display:block;font-size:13px;color:var(--muted);margin-top:10px}
+input[type=text]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit}
+.row{display:flex;gap:8px;margin-top:10px}
+button{padding:10px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),var(--accent2));color:white;font-weight:600;cursor:pointer}
+button.danger{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+button.primary{background:linear-gradient(90deg,var(--accent2),var(--accent))}
+
+.pickups{margin-top:12px}
+.waypoint{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.02);margin-top:8px;background:rgba(255,255,255,0.01)}
+.waypoint input{flex:1;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.02);background:transparent;color:inherit}
+.waypoint button{padding:6px 8px;border-radius:8px;background:transparent;border:0;color:var(--muted);cursor:pointer}
+
+.results{margin-top:12px;background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;font-size:14px}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+a.link{background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;color:inherit;text-decoration:none;border:1px solid rgba(255,255,255,0.02)}
+.small{font-size:13px;color:var(--muted)}
+.notes{margin-top:10px;font-size:12px;color:var(--muted)}
+
+.mapPanel{display:flex;flex-direction:column}
+#map{height:78vh;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.03)}
+footer{margin-top:10px;color:var(--muted);font-size:13px}
+
+@media (max-width:920px){
+  .container{grid-template-columns:1fr;padding:12px}
+  #map{height:50vh}
+}
