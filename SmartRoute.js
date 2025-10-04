@@ -1,4 +1,5 @@
-// SmartRoute.js - Improved Version
+// SmartRoute.js - Using OpenRouteService for real road routing
+
 window.addEventListener('load', () => {
   const $ = id => document.getElementById(id);
   let pickupCount = 0;
@@ -10,17 +11,18 @@ window.addEventListener('load', () => {
   const resultsDiv = $('results');
   const linksDiv = $('links');
 
+  // Your OpenRouteService API key:
+  const ORS_API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjMwZDlmZDEwMjZkZDRmZmJiMDU2NzI0ZDM3OWM3NDg0IiwiaCI6Im11cm11cjY0In0=";
+
   let map, markers = [], routeLine = null;
   let markerIcons = {};
 
-  // Custom marker icons for start/pickup/drop-off
   function loadMarkerIcons() {
     markerIcons.start = L.icon({iconUrl:'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers@master/img/marker-icon-green.png',iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34]});
     markerIcons.pickup = L.icon({iconUrl:'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers@master/img/marker-icon-blue.png',iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34]});
     markerIcons.dropoff = L.icon({iconUrl:'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers@master/img/marker-icon-red.png',iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34]});
   }
 
-  // Initialize map safely
   function initMap() {
     if (typeof L === 'undefined') {
       resultsDiv.innerHTML = '<span style="color:red">Error: Map library failed to load. Please refresh the page.</span>';
@@ -109,12 +111,10 @@ window.addEventListener('load', () => {
   };
 
   async function geocode(address){
-    // Accept "lat,lon" directly
     if (/^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/.test(address)) {
       const [lat, lon] = address.split(',').map(x=>parseFloat(x));
       return {lat, lon, name:`${lat},${lon}`};
     }
-    // Otherwise use Nominatim
     const url=`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&addressdetails=1`;
     const res = await fetch(url);
     const data = await res.json();
@@ -141,6 +141,24 @@ window.addEventListener('load', () => {
     return result;
   }
 
+  // NEW: Fetch driving route polyline from OpenRouteService
+  async function getDrivingRouteORS(points, apiKey) {
+    const coords = points.map(p => [p.lon, p.lat]);
+    const url = "https://api.openrouteservice.org/v2/directions/driving-car/geojson";
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": apiKey,
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({coordinates: coords})
+    });
+    const data = await res.json();
+    if (!data || !data.features || !data.features[0]) throw new Error("Routing failed");
+    return data.features[0].geometry.coordinates.map(([lon, lat]) => [lat, lon]);
+  }
+
   optimizeBtn.onclick = async ()=>{
     resultsDiv.innerHTML='<span class="small">Working...</span>'; 
     linksDiv.innerHTML=''; 
@@ -155,7 +173,6 @@ window.addEventListener('load', () => {
       if(pickupInputs.length===0) throw new Error('Enter at least one pickup');
       if(pickupInputs.length > 6) throw new Error('Maximum 6 pickups allowed!');
 
-      // Get start point: Use GPS if blank
       let startPoint;
       if(!startRaw){
         if(!navigator.geolocation) throw new Error('No start location or GPS available.');
@@ -171,11 +188,9 @@ window.addEventListener('load', () => {
       }
       let endPoint = await geocode(endRaw);
 
-      // Geocode all pickups
       const pickups = [];
       for(const p of pickupInputs) pickups.push(await geocode(p));
 
-      // Find best pickup order
       const orders=permute(pickups.map((_,i)=>i));
       let bestDist=Infinity, bestOrder=null;
       orders.forEach(order=>{
@@ -186,25 +201,33 @@ window.addEventListener('load', () => {
       });
 
       const route=[startPoint,...bestOrder.map(i=>pickups[i]),endPoint];
-      // Show results
       resultsDiv.innerHTML='<ol>'+route.map((p,i)=>`<li>${i===0?'Start':i===route.length-1?'Drop-off':'Pickup'}: ${p.name}</li>`).join('')+'</ol>';
-      resultsDiv.innerHTML+=`<div>Total straight-line distance ≈ <b>${(bestDist/1000).toFixed(2)} km</b></div>`;
 
-      // Draw markers and route
+      // Get actual driving route polyline from OpenRouteService
+      let polyline = null;
+      try {
+        polyline = await getDrivingRouteORS(route, ORS_API_KEY);
+        routeLine = L.polyline(polyline,{color:'blue',weight:5,opacity:0.7}).addTo(map);
+        map.fitBounds(polyline, {padding:[50,50]});
+      } catch(e) {
+        resultsDiv.innerHTML += `<div style="color:red">Couldn't get driving route, showing straight line.</div>`;
+        routeLine=L.polyline(route.map(p=>[p.lat,p.lon]),{color:'blue',weight:5,opacity:0.7}).addTo(map);
+        map.fitBounds(route.map(p=>[p.lat,p.lon]), {padding:[50,50]});
+      }
+
+      // Add markers
       route.forEach((p,i)=>{
         let type = (i===0)?'start':(i===route.length-1?'dropoff':'pickup');
         addMarker(p.lat,p.lon,`${i===0?'Start':i===route.length-1?'Drop-off':'Pickup'}<br>${p.name}`,type);
       });
-      routeLine=L.polyline(route.map(p=>[p.lat,p.lon]),{color:'blue',weight:5,opacity:0.7}).addTo(map);
-      map.fitBounds(route.map(p=>[p.lat,p.lon]), {padding:[50,50]});
 
-      // Google Maps link
-      const origin=`${startPoint.lat},${startPoint.lon}`;
-      const destination=`${endPoint.lat},${endPoint.lon}`;
-      const waypoints=bestOrder.map(i=>`${pickups[i].lat},${pickups[i].lon}`).join('|');
-      // Google Maps: up to 25 waypoints allowed, but we have max 6
-      const gmaps=`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=driving&waypoints=${encodeURIComponent(waypoints)}`;
-      linksDiv.innerHTML=`<a class="link" href="${gmaps}" target="_blank">Open in Google Maps</a>`;
+      // Show route stats
+      resultsDiv.innerHTML+=`<div>Total straight-line distance ≈ <b>${(bestDist/1000).toFixed(2)} km</b></div>`;
+
+      // Improved Google Maps link: multi-destination
+      const gmArr = route.map(p=>`${p.lat},${p.lon}`);
+      const gmaps = `https://www.google.com/maps/dir/${gmArr.map(encodeURIComponent).join('/')}`;
+      linksDiv.innerHTML=`<a class="link" href="${gmaps}" target="_blank">Open in Google Maps (driving route)</a>`;
 
     }catch(err){ 
       resultsDiv.innerHTML='<span style="color:red">'+err.message+'</span>'; 
@@ -213,6 +236,5 @@ window.addEventListener('load', () => {
     optimizeBtn.disabled = false;
   }
 
-  // Start with 3 pickups
   for(let i=0;i<3;i++) createPickup();
 });
