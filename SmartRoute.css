@@ -14,24 +14,36 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,#071024 0%, #07
 .title h1{margin:0;font-size:20px}
 .tag{font-size:13px;color:var(--muted)}
 
+.instructions {
+  background: var(--glass);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size:14px;
+  color:var(--muted);
+}
+
 .container{display:grid;grid-template-columns:420px 1fr;gap:20px;padding:22px;align-items:start;max-width:1200px;margin:0 auto}
 .panel{background:var(--card);padding:16px;border-radius:var(--radius);box-shadow:0 8px 20px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
 .inputs h2{margin:0 0 8px}
 label{display:block;font-size:13px;color:var(--muted);margin-top:10px}
 input[type=text]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit}
+input[type=text]:focus{outline:2px solid var(--accent2);}
 .row{display:flex;gap:8px;margin-top:10px}
-button{padding:10px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),var(--accent2));color:white;font-weight:600;cursor:pointer}
+button{padding:10px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),var(--accent2));color:white;font-weight:600;cursor:pointer;transition:background 0.2s;}
 button.danger{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
 button.primary{background:linear-gradient(90deg,var(--accent2),var(--accent))}
+button:disabled{background:var(--muted);color:#333;cursor:not-allowed}
 
 .pickups{margin-top:12px}
 .waypoint{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.02);margin-top:8px;background:rgba(255,255,255,0.01)}
 .waypoint input{flex:1;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.02);background:transparent;color:inherit}
 .waypoint button{padding:6px 8px;border-radius:8px;background:transparent;border:0;color:var(--muted);cursor:pointer}
 
-.results{margin-top:12px;background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;font-size:14px}
+.results{margin-top:12px;background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;font-size:14px;min-height:36px}
 .links{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 a.link{background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;color:inherit;text-decoration:none;border:1px solid rgba(255,255,255,0.02)}
+a.link:hover{background:var(--accent2);color:#fff;}
 .small{font-size:13px;color:var(--muted)}
 .notes{margin-top:10px;font-size:12px;color:var(--muted)}
 
@@ -42,4 +54,9 @@ footer{margin-top:10px;color:var(--muted);font-size:13px}
 @media (max-width:920px){
   .container{grid-template-columns:1fr;padding:12px}
   #map{height:50vh}
+}
+@media (max-width:600px){
+  .panel.inputs,.panel.mapPanel{padding:6px;}
+  .instructions{font-size:13px;}
+  #map{height:35vh;}
 }
